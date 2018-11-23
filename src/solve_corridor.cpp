@@ -52,9 +52,13 @@ public:
         pose dirOfParent = checkWhichNeighbour(parent);
 
         Point pTemp = Point(this->x,this->y);
+
+        maze.passThrough(pTemp.x, pTemp.y);
+
         pTemp = movePos(pTemp, dirOfParent);
 
         pose movingPose = dirOfParent;
+
 
         bool flagCorr = isCorridorOrCorner(pTemp,movingPose); 
         while(flagCorr == true){
@@ -72,6 +76,7 @@ public:
         pose dirOfParent = checkWhichNeighbour(parent);
 
         Point pTemp = Point(this->x,this->y);
+        maze.write(pTemp.x, pTemp.y, r, 0, b);
         pTemp = movePos(pTemp, dirOfParent);
 
         pose movingPose = dirOfParent;
@@ -133,10 +138,10 @@ public:
         Point frontNeighbour = movePos(currentPosition,_pos);
 
         if(maze.cell(frontNeighbour.x,frontNeighbour.y) == 0){
-            // block in the same direction 
+            // block in the moving direction 
             int temp = checkBlockedCorridor(currentPosition,_pos);
             if(temp == 1){
-                // this one corridor open which is not in the same direction :  _pos changes
+                // this is a corner, function returns the pose of the open corner( the direction :  _pos changes)
                 pose tempPos = whichCorrPosNotBlocked(currentPosition,_pos);
                 _pos = tempPos;
                 return true;
@@ -150,7 +155,7 @@ public:
                 // straight corridor: _pos remains the same
                 return true;
             }
-            else return false; // temp = 1: 2 branches temp =2: 3 branches
+            else return false; // temp = 1: => 2 branches and temp =2:  =>3 branches
         }
 
     }
@@ -166,15 +171,20 @@ public:
             Point lastValidNeighbour = immediateParentNeighbour;
             pose movingPose = _pos;
 
+            // keep checking for corridor or corner 
+            // the movingPose changes when there is a corner and remains same if a corridor
             bool flagCorr = isCorridorOrCorner(lastValidNeighbour,movingPose); 
             _move_distance = 1;
 
+            // a loop for iteratively moving through a passage (corner + corridor)
             while(flagCorr == true){
                 _move_distance++;
                 lastValidNeighbour = movePos(lastValidNeighbour,movingPose);
                 flagCorr = isCorridorOrCorner(lastValidNeighbour,movingPose);
             }
 
+            // the lastValidNeighbour will always contain a true neighbour 
+            // a deadend or intersection
             _trueNeighibour = lastValidNeighbour;
             return true;
         }
@@ -187,6 +197,7 @@ public:
 
         Point validNeighbour; 
 
+        // loop over  each possible position of the neighbours
         for ( int neighboursPos = 0; neighboursPos < NUMBER_OF_POSE; neighboursPos++ ){
             int move_distance;
             if(getTrueNeighbour(validNeighbour,arrayPose[neighboursPos],move_distance)){
