@@ -6,13 +6,33 @@ using namespace std;
 using namespace ecn;
 
 /* 
+
+Assignment for ARPRO: maze 
+
+By: Astha
+
+Approach: create a enum to define the pose of the neighbour 
+         for a given parent, this helps in reducing any typing mistakes 
+
+         reduce the no of nodes created for A* algorithm, by figuring 
+         out the true neighbours(neighbours that are not in a corridor or 
+         are corner of a passage, as we there is no choice for the search algorithm 
+         but to keep moving ahead)
+
+Definition of pose:
     right   -> y+1
     left    -> y-1
     up      -> x-1
     down    -> x+1
-*/
 
-// const int NUMBER_OF_POSE = 4;
+true neighbour: neighbour at the end of a corridor(line and corner)
+
+Output: A image of solved maze  mazes/maze_line.png 
+that shows the taken path by the A* algorithm after reducing the number 
+of steps by finding the true neighbour of any given Position/Point
+in the maze
+
+*/
 
 // a node is a x-y position, we move from 1 each time
 class Position : public Point
@@ -40,6 +60,13 @@ public:
     {
         return distance;
     }
+
+    /*
+        Helps with print and show when we need to find the parent from the given
+        Position/Point. We only need the direction in which parent is, as we can 
+        always follow that direct and find the parent in the corridor(line or corner) in that 
+        direction. 
+    */ 
 
     pose checkWhichNeighbour(const Point & parent){
         for(int i =0; i < NUMBER_OF_POSE; i++){
@@ -122,7 +149,7 @@ public:
     }
 
     pose whichCorrPosNotBlocked(const Point& _p,const pose& _pos){
-        /* Assumption corner case: only one will be open */
+        // Assumption corner case: only one will be open 
         if(_pos == right || _pos == left){
             if(maze.cell(_p.x-1,_p.y) == 1) return pose(up);
             if(maze.cell(_p.x+1,_p.y) == 1) return pose(down);

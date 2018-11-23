@@ -136,7 +136,7 @@ public:
         int dot = filename.find(".");
         std::string name = filename.substr(0, dot) + "_" + suffix + ".png";
         cv::imwrite("../mazes/" + name, out);
-        // display("Solution", out);
+        display("Solution", out);
     }
 protected:
     cv::Mat im, out;
